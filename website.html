@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FysioHjem — Personlig fysioterapi til dit plejehjem</title>
+<meta name="description" content="FysioHjem tilbyder personlig fysioterapi direkte på dit plejehjem i Aarhus-området. Kontakt Karen for en gratis samtale.">
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --primary: #5a9e8f;
+  --primary-light: #e8f4f0;
+  --primary-dark: #3d7a6d;
+  --accent: #e8a75a;
+  --accent-light: #fdf3e4;
+  --bg: #f7f9f8;
+  --white: #ffffff;
+  --text: #2d3436;
+  --text-light: #636e72;
+  --border: #e0e6e4;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* ===== SCROLL REVEAL ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== UTILITY ===== */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.section {
+  padding: 80px 0;
+}
+.section-label {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  line-height: 1.25;
+}
+.section-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  max-width: 600px;
+  line-height: 1.6;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.btn-primary {
+  background: var(--primary);
+  color: var(--white);
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-accent {
+  background: var(--accent);
+  color: var(--white);
+}
+.btn-accent:hover { background: #d4943e; }
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+.btn-outline:hover {
+  background: var(--primary);
+  color: var(--white);
+}
+
+/* ===== NAVIGATION ===== */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: box-shadow 0.3s;
+}
+.navbar.scrolled { box-shadow: var(--shadow); }
+.navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.navbar-logo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.navbar-logo svg { width: 28px; height: 28px; }
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+.nav-links a {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-light);
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: width 0.3s;
+}
+.nav-links a:hover { color: var(--primary); }
+.nav-links a:hover::after { width: 100%; }
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  background: none;
+  border: none;
+}
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2.5px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+.hamburger.active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+/* Mobile nav */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  z-index: 999;
+  padding: 16px 0;
+}
+.mobile-nav.open { display: block; }
+.mobile-nav a {
+  display: block;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+  transition: background 0.2s;
+}
+.mobile-nav a:hover { background: var(--primary-light); color: var(--primary); }
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+}
+
+/* ===== HERO ===== */
+.hero {
+  padding: 140px 0 100px;
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 40%, var(--accent-light) 100%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(90,158,143,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -40%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(232,167,90,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero .container { position: relative; z-index: 1; }
+.hero h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+  margin-bottom: 20px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero h1 span { color: var(--primary); }
+.hero p {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  max-width: 540px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .hero { padding: 120px 0 70px; }
+  .hero h1 { font-size: 2rem; }
+  .hero p { font-size: 1.05rem; }
+}
+
+/* ===== OM KAREN ===== */
+.om-section { background: var(--white); }
+.om-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 48px;
+  align-items: center;
+}
+.om-photo {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border: 4px solid var(--white);
+  box-shadow: var(--shadow-lg), 0 0 0 8px var(--primary-light);
+  position: relative;
+  overflow: hidden;
+}
+.om-photo-placeholder {
+  font-size: 4rem;
+  color: var(--primary);
+  opacity: 0.5;
+}
+.om-content h3 {
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.om-content p {
+  color: var(--text-light);
+  margin-bottom: 14px;
+  line-height: 1.7;
+}
+.om-credentials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.credential-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.om-motto {
+  margin-top: 24px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .om-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .om-credentials { justify-content: center; }
+}
+
+/* ===== FORSKEL / VALUE PROP ===== */
+.forskel-section { background: var(--bg); }
+.forskel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+.forskel-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--primary);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.forskel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.forskel-card .icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 14px;
+}
+.forskel-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.forskel-card p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+/* ===== TJENESTER ===== */
+.tjenester-section { background: var(--white); }
+.tjenester-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+.tjeneste-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid var(--border);
+}
+.tjeneste-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.tjeneste-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin: 0 auto 18px;
+}
+.tjeneste-card h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.tjeneste-card p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+/* ===== HOW IT WORKS ===== */
+.steps-section { background: var(--bg); }
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 40px;
+  position: relative;
+}
+.steps-grid::before {
+  content: '';
+  position: absolute;
+  top: 44px;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  background: var(--border);
+}
+.step {
+  text-align: center;
+  position: relative;
+}
+.step-number {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 auto 18px;
+  position: relative;
+  z-index: 1;
+}
+.step h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.step p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .steps-grid::before { display: none; }
+}
+
+/* ===== B2B / PLEJECENTER ===== */
+.b2b-section {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: var(--white);
+}
+.b2b-section .section-label {
+  background: rgba(255,255,255,0.15);
+  color: var(--white);
+}
+.b2b-section .section-title { color: var(--white); }
+.b2b-section .section-subtitle { color: rgba(255,255,255,0.8); }
+.b2b-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+.b2b-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.b2b-card .icon {
+  font-size: 1.8rem;
+  margin-bottom: 14px;
+}
+.b2b-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.b2b-card p {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+.b2b-cta {
+  margin-top: 40px;
+  text-align: center;
+}
+.b2b-cta .btn-accent {
+  font-size: 1.05rem;
+  padding: 16px 32px;
+}
+
+/* ===== TESTIMONIALS ===== */
+.testimonials-section { background: var(--white); }
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+.testimonial-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 28px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+.testimonial-card::before {
+  content: '\201C';
+  font-size: 4rem;
+  color: var(--primary);
+  opacity: 0.15;
+  position: absolute;
+  top: 8px;
+  left: 20px;
+  line-height: 1;
+  font-family: Georgia, serif;
+}
+.testimonial-text {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  line-height: 1.7;
+  font-style: italic;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.testimonial-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+.testimonial-name { font-weight: 600; font-size: 0.9rem; }
+.testimonial-role { font-size: 0.8rem; color: var(--text-light); }
+
+/* ===== KONTAKT ===== */
+.kontakt-section { background: var(--bg); }
+.kontakt-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-top: 40px;
+}
+.kontakt-info h3 {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+}
+.kontakt-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.kontakt-item .icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.kontakt-item-text strong {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+.kontakt-item-text span {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+.kontakt-item-text a {
+  color: var(--primary);
+  font-weight: 500;
+}
+.ring-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  background: var(--primary);
+  color: var(--white);
+  padding: 14px 28px;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.ring-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: var(--primary-dark);
+}
+.kontakt-form {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+.kontakt-form h3 {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: var(--font);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: var(--bg);
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(90,158,143,0.15);
+}
+.form-group textarea { resize: vertical; min-height: 100px; }
+.form-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.form-submit:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .kontakt-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: var(--text);
+  color: rgba(255,255,255,0.7);
+  padding: 48px 0 24px;
+}
+.footer-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+.footer-brand .navbar-logo { color: var(--white); margin-bottom: 10px; }
+.footer-brand p { font-size: 0.85rem; max-width: 280px; }
+.footer-links h4 {
+  color: var(--white);
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+.footer-links a {
+  display: block;
+  font-size: 0.85rem;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--white); }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .footer-grid { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <a href="#" class="navbar-logo">
+      <svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#5a9e8f" stroke-width="2"/><path d="M9 18c2-4 4-8 5-8s3 4 5 8" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="8" r="2.5" fill="#5a9e8f"/></svg>
+      FysioHjem
+    </a>
+    <div class="nav-links">
+      <a href="#om">Om</a>
+      <a href="#tjenester">Tjenester</a>
+      <a href="#forskel">Forskellen</a>
+      <a href="#plejecenter">For plejecentre</a>
+      <a href="#kontakt">Kontakt</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="#om">Om Karen</a>
+  <a href="#tjenester">Tjenester</a>
+  <a href="#forskel">Forskellen</a>
+  <a href="#plejecenter">For plejecentre</a>
+  <a href="#kontakt">Kontakt</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="top">
+  <div class="container">
+    <div class="reveal">
+      <h1>Personlig fysioterapi — <span>direkte til dit plejehjem</span></h1>
+      <p>Kvalitet, kontinuitet og omsorg. Jeg kommer til dig, så du kan fokusere på det vigtigste — dit helbred og din trivsel.</p>
+      <div class="hero-buttons">
+        <a href="#kontakt" class="btn btn-primary">Kontakt Karen</a>
+        <a href="#tjenester" class="btn btn-outline">Se tjenester</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OM KAREN ===== -->
+<section class="section om-section" id="om">
+  <div class="container">
+    <div class="om-grid reveal">
+      <div class="om-photo">
+        <div class="om-photo-placeholder">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="30" r="14" fill="#5a9e8f" opacity="0.3"/><ellipse cx="40" cy="62" rx="22" ry="14" fill="#5a9e8f" opacity="0.2"/></svg>
+        </div>
+      </div>
+      <div class="om-content">
+        <span class="section-label">Om Karen</span>
+        <h3 class="section-title">Fysioterapi med hjertet forrest</h3>
+        <p>Jeg hedder Karen, og jeg er autoriseret fysioterapeut med mange års erfaring inden for ældreområdet. Min drivkraft er at hjælpe mennesker med at bevare deres bevægelighed, selvstændighed og livsglæde — uanset alder.</p>
+        <p>Jeg oplevede for ofte, at den kommunale fysioterapi ikke rakte til. For korte besøg, skiftende terapeuter og for lidt tid til det hele menneske. Derfor startede jeg FysioHjem — for at tilbyde den kvalitet og kontinuitet, som gør en reel forskel.</p>
+        <div class="om-credentials">
+          <span class="credential-badge">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 8l2 2 4-4" stroke="#3d7a6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="7" stroke="#3d7a6d" stroke-width="1.5"/></svg>
+            Autoriseret fysioterapeut
+          </span>
+          <span class="credential-badge">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 8l2 2 4-4" stroke="#3d7a6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="7" stroke="#3d7a6d" stroke-width="1.5"/></svg>
+            Erfaring med ældreområdet
+          </span>
+          <span class="credential-badge">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 8l2 2 4-4" stroke="#3d7a6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="7" stroke="#3d7a6d" stroke-width="1.5"/></svg>
+            Specialiseret i genoptræning
+          </span>
+        </div>
+        <p class="om-motto">"Jeg kommer til dig"</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FORSKEL / VALUE PROPOSITION ===== -->
+<section class="section forskel-section" id="forskel">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:8px;">
+      <span class="section-label">Forskellen</span>
+      <h2 class="section-title" style="max-width:600px; margin-left:auto; margin-right:auto;">Hvad gør FysioHjem anderledes?</h2>
+      <p class="section-subtitle" style="margin:0 auto;">Hvorfor vælge privat fysioterapi, når kommunen tilbyder det gratis? Fordi kvalitet kræver tid, tillid og kontinuitet.</p>
+    </div>
+    <div class="forskel-grid">
+      <div class="forskel-card reveal">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="#5a9e8f" stroke-width="2"/><path d="M11 6v5l3.5 3.5" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h4>Mere tid</h4>
+        <p>Kommunale besøg er ofte korte og pressede. Hos FysioHjem tager jeg den tid, der er behov for — til behandling, samtale og opfølgning.</p>
+      </div>
+      <div class="forskel-card reveal">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#5a9e8f" stroke-width="2"/><path d="M4 19c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h4>Samme terapeut</h4>
+        <p>Ikke skiftende vikarer, men én fast terapeut der kender dig, din historie og dine mål. Personlig kontinuitet giver bedre resultater.</p>
+      </div>
+      <div class="forskel-card reveal">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#5a9e8f" stroke-width="2"/><path d="M3 9h16M8 4V2M14 4V2" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h4>Fleksible tider</h4>
+        <p>Behandling tilpasset din hverdag — ikke kommunens skema. Vi finder tidspunkter, der passer dig og dit plejehjem.</p>
+      </div>
+      <div class="forskel-card reveal">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4C7.5 4 5 7 5 10.5S11 19 11 19s6-5.5 6-8.5S14.5 4 11 4z" stroke="#5a9e8f" stroke-width="2"/><circle cx="11" cy="10" r="2" fill="#5a9e8f"/></svg>
+        </div>
+        <h4>Hele mennesket</h4>
+        <p>En helhedsorienteret tilgang, hvor jeg ser dig som person — ikke kun en diagnose. Krop, sind og livskvalitet hænger sammen.</p>
+      </div>
+      <div class="forskel-card reveal">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 14l4-4 3 3 7-7" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6h4v4" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h4>Forebyggelse</h4>
+        <p>Proaktiv indsats fremfor brandslukning. Sammen arbejder vi på at forebygge fald, smerter og tab af funktionsevne.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TJENESTER ===== -->
+<section class="section tjenester-section" id="tjenester">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:8px;">
+      <span class="section-label">Tjenester</span>
+      <h2 class="section-title">Hvad kan jeg hjælpe med?</h2>
+      <p class="section-subtitle" style="margin:0 auto;">Skræddersyet fysioterapi, der møder dig, hvor du er.</p>
+    </div>
+    <div class="tjenester-grid">
+      <div class="tjeneste-card reveal">
+        <div class="tjeneste-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="10" r="5" stroke="#5a9e8f" stroke-width="2"/><path d="M8 26c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round"/><path d="M22 14l3 3-3 3" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h4>Individuel behandling</h4>
+        <p>Personlig fysioterapi tilpasset dine specifikke behov — smertereduktion, mobilitet, styrke og balance.</p>
+      </div>
+      <div class="tjeneste-card reveal">
+        <div class="tjeneste-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="10" cy="12" r="4" stroke="#5a9e8f" stroke-width="2"/><circle cx="22" cy="12" r="4" stroke="#5a9e8f" stroke-width="2"/><circle cx="16" cy="22" r="4" stroke="#5a9e8f" stroke-width="2"/></svg>
+        </div>
+        <h4>Holdtræning</h4>
+        <p>Små holdtræninger på plejehjemmet — socialt samvær og motion hånd i hånd. Tilpasset alle niveauer.</p>
+      </div>
+      <div class="tjeneste-card reveal">
+        <div class="tjeneste-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="6" y="4" width="20" height="24" rx="3" stroke="#5a9e8f" stroke-width="2"/><path d="M11 10h10M11 15h10M11 20h6" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h4>Øvelsesprogram</h4>
+        <p>Individuelle øvelsesprogrammer med tydelige instruktioner, som du og personalet nemt kan følge i hverdagen.</p>
+      </div>
+      <div class="tjeneste-card reveal">
+        <div class="tjeneste-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16 6v4M16 22v4M6 16h4M22 16h4" stroke="#5a9e8f" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="16" r="6" stroke="#5a9e8f" stroke-width="2"/><circle cx="16" cy="16" r="10" stroke="#5a9e8f" stroke-width="1.5" stroke-dasharray="3 3"/></svg>
+        </div>
+        <h4>Helbredsvurdering</h4>
+        <p>Grundig vurdering af fysisk funktionsevne med anbefalinger til videre forløb — klarhed og tryghed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section steps-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:8px;">
+      <span class="section-label">Kom i gang</span>
+      <h2 class="section-title">Sådan fungerer det</h2>
+      <p class="section-subtitle" style="margin:0 auto;">Tre enkle trin til bedre fysisk trivsel.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step reveal">
+        <div class="step-number">1</div>
+        <h4>Kontakt mig</h4>
+        <p>Ring, skriv eller udfyld formularen. Fortæl kort om din situation, så tager vi en snak.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-number">2</div>
+        <h4>Gratis samtale</h4>
+        <p>Vi mødes uforpligtende — enten på plejehjemmet eller telefonisk — og lægger en plan sammen.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-number">3</div>
+        <h4>Behandling starter</h4>
+        <p>Jeg kommer til dit plejehjem på de aftalte tidspunkter. Trygt, nært og med fuld fokus på dig.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== B2B / PLEJECENTER ===== -->
+<section class="section b2b-section" id="plejecenter">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:8px;">
+      <span class="section-label">For plejecentre</span>
+      <h2 class="section-title">Et stærkere tilbud til jeres beboere</h2>
+      <p class="section-subtitle" style="margin:0 auto;">Supplér den kommunale fysioterapi med et fleksibelt, privat tilbud der gør en forskel i hverdagen.</p>
+    </div>
+    <div class="b2b-grid">
+      <div class="b2b-card reveal">
+        <div class="icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 4l3 6h6l-5 4 2 6-6-3-6 3 2-6-5-4h6l3-6z" stroke="white" stroke-width="1.5" fill="none"/></svg>
+        </div>
+        <h4>Supplement til kommunen</h4>
+        <p>FysioHjem erstatter ikke den kommunale indsats — vi supplerer den. Jeres beboere får mere tid, mere opmærksomhed og bedre resultater.</p>
+      </div>
+      <div class="b2b-card reveal">
+        <div class="icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14h16M14 6v16" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h4>Fleksibel samarbejdsmodel</h4>
+        <p>Vi finder en model, der passer jeres behov — faste dage, ad hoc-besøg eller en kombination. Ingen lange kontrakter.</p>
+      </div>
+      <div class="b2b-card reveal">
+        <div class="icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 4C8.5 4 4 8.5 4 14s4.5 10 10 10 10-4.5 10-10S19.5 4 14 4z" stroke="white" stroke-width="1.5"/><path d="M10 14l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h4>Øget beboertilfredshed</h4>
+        <p>Personlig, kontinuerlig fysioterapi øger trivsel og tilfredshed — hos beboere, pårørende og personale.</p>
+      </div>
+    </div>
+    <div class="b2b-cta reveal">
+      <a href="#kontakt" class="btn btn-accent">Book et uforpligtende møde</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="section testimonials-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:8px;">
+      <span class="section-label">Det siger andre</span>
+      <h2 class="section-title">Hvad mine kunder siger</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <p class="testimonial-text">"Karen giver mig den tid og ro, jeg har brug for. Jeg føler mig tryg, og mine knæ er så meget bedre. Det er helt anderledes end de korte kommunale besøg."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="8" r="4" stroke="#5a9e8f" stroke-width="1.5"/><path d="M3 18c0-3 3.1-5.5 7-5.5s7 2.5 7 5.5" stroke="#5a9e8f" stroke-width="1.5"/></svg>
+          </div>
+          <div>
+            <div class="testimonial-name">Inge M.</div>
+            <div class="testimonial-role">Beboer, plejehjem i Aarhus</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <p class="testimonial-text">"Det giver os en enorm tryghed at vide, at mor får personlig behandling af en terapeut, der kender hende. Karen er fantastisk til at kommunikere med os."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="8" r="4" stroke="#5a9e8f" stroke-width="1.5"/><path d="M3 18c0-3 3.1-5.5 7-5.5s7 2.5 7 5.5" stroke="#5a9e8f" stroke-width="1.5"/></svg>
+          </div>
+          <div>
+            <div class="testimonial-name">Mette og Lars K.</div>
+            <div class="testimonial-role">Pårørende</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <p class="testimonial-text">"Vi har fået et rigtig godt samarbejde med Karen. Beboerne er glade, pårørende er tilfredse, og det letter presset på vores eget personale."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="8" r="4" stroke="#5a9e8f" stroke-width="1.5"/><path d="M3 18c0-3 3.1-5.5 7-5.5s7 2.5 7 5.5" stroke="#5a9e8f" stroke-width="1.5"/></svg>
+          </div>
+          <div>
+            <div class="testimonial-name">Susanne T.</div>
+            <div class="testimonial-role">Leder, plejecenter</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== KONTAKT ===== -->
+<section class="section kontakt-section" id="kontakt">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:8px;">
+      <span class="section-label">Kontakt</span>
+      <h2 class="section-title">Lad os tage en snak</h2>
+      <p class="section-subtitle" style="margin:0 auto;">Har du spørgsmål, eller vil du høre mere? Jeg vender altid tilbage inden for 24 timer.</p>
+    </div>
+    <div class="kontakt-grid reveal">
+      <div class="kontakt-info">
+        <h3>Karen Eksempel</h3>
+        <div class="kontakt-item">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4h12l-6 5-6-5z" stroke="#5a9e8f" stroke-width="1.5"/><rect x="3" y="4" width="14" height="11" rx="2" stroke="#5a9e8f" stroke-width="1.5"/></svg>
+          </div>
+          <div class="kontakt-item-text">
+            <strong>Email</strong>
+            <a href="mailto:karen@fysiohjem.dk">karen@fysiohjem.dk</a>
+          </div>
+        </div>
+        <div class="kontakt-item">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 3h3l2 4-2.5 1.5a11 11 0 005 5L14 11l4 2v3a2 2 0 01-2 2C8.5 18 2 11.5 2 5a2 2 0 012-2z" stroke="#5a9e8f" stroke-width="1.5"/></svg>
+          </div>
+          <div class="kontakt-item-text">
+            <strong>Telefon</strong>
+            <a href="tel:+4512345678">+45 12 34 56 78</a>
+          </div>
+        </div>
+        <div class="kontakt-item">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="8.5" r="5.5" stroke="#5a9e8f" stroke-width="1.5"/><path d="M10 14v4M6 18h8" stroke="#5a9e8f" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="kontakt-item-text">
+            <strong>Område</strong>
+            <span>Aarhus og omegn</span>
+          </div>
+        </div>
+        <a href="tel:+4512345678" class="ring-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4.5 2.5h2.7l1.8 3.6-2.25 1.35a9.9 9.9 0 004.5 4.5L12.6 9.7l3.6 1.8v2.7a1.8 1.8 0 01-1.8 1.8C7.65 16 2 10.35 2 4.3a1.8 1.8 0 011.8-1.8z" stroke="white" stroke-width="1.5"/></svg>
+          Ring direkte
+        </a>
+      </div>
+      <form class="kontakt-form" onsubmit="handleSubmit(event)">
+        <h3>Send en besked</h3>
+        <div class="form-group">
+          <label for="name">Navn</label>
+          <input type="text" id="name" name="name" placeholder="Dit fulde navn" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Telefon</label>
+          <input type="tel" id="phone" name="phone" placeholder="Dit telefonnummer">
+        </div>
+        <div class="form-group">
+          <label for="message">Besked</label>
+          <textarea id="message" name="message" placeholder="Fortæl kort hvad du har brug for..." required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Send besked</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="navbar-logo">
+          <svg viewBox="0 0 28 28" fill="none" width="28" height="28"><circle cx="14" cy="14" r="13" stroke="white" stroke-width="2"/><path d="M9 18c2-4 4-8 5-8s3 4 5 8" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="8" r="2.5" fill="white"/></svg>
+          FysioHjem
+        </div>
+        <p>Personlig fysioterapi direkte til dit plejehjem i Aarhus-området.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Sider</h4>
+        <a href="#om">Om Karen</a>
+        <a href="#tjenester">Tjenester</a>
+        <a href="#forskel">Forskellen</a>
+        <a href="#plejecenter">For plejecentre</a>
+        <a href="#kontakt">Kontakt</a>
+      </div>
+      <div class="footer-links">
+        <h4>Kontakt</h4>
+        <a href="mailto:karen@fysiohjem.dk">karen@fysiohjem.dk</a>
+        <a href="tel:+4512345678">+45 12 34 56 78</a>
+        <a>Aarhus og omegn</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Autoriseret fysioterapeut</span>
+      <span>&copy; 2026 FysioHjem. Alle rettigheder forbeholdes.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ===== SCROLL REVEAL =====
+const revealElements = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+revealElements.forEach(el => revealObserver.observe(el));
+
+// ===== NAVBAR SCROLL SHADOW =====
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 10);
+});
+
+// ===== HAMBURGER MENU =====
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobileNav');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  mobileNav.classList.toggle('open');
+});
+
+// Close mobile nav on link click
+mobileNav.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    hamburger.classList.remove('active');
+    mobileNav.classList.remove('open');
+  });
+});
+
+// ===== FORM HANDLER (frontend only) =====
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.form-submit');
+  const originalText = btn.textContent;
+  btn.textContent = 'Tak for din besked!';
+  btn.style.background = '#6ab04c';
+  e.target.reset();
+  setTimeout(() => {
+    btn.textContent = originalText;
+    btn.style.background = '';
+  }, 3000);
+}
+</script>
+</body>
+</html>
