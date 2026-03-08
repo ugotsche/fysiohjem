@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FysioHjem</title>
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --primary: #5a9e8f;
+  --primary-light: #e8f4f0;
+  --primary-dark: #3d7a6d;
+  --accent: #e8a75a;
+  --accent-light: #fdf3e4;
+  --bg: #f7f9f8;
+  --white: #ffffff;
+  --text: #2d3436;
+  --text-light: #636e72;
+  --text-lighter: #b2bec3;
+  --border: #e0e6e4;
+  --success: #6ab04c;
+  --warning: #f0932b;
+  --danger: #e74c3c;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --phone-width: 375px;
+  --phone-height: 812px;
+}
+
+/* ===== RESET & BASE ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font);
+  background: #e2e8e6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* ===== PHONE FRAME ===== */
+.phone-frame {
+  width: var(--phone-width);
+  height: var(--phone-height);
+  background: var(--bg);
+  border-radius: 40px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 2px #1a1a1a;
+}
+.phone-frame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 28px;
+  background: #1a1a1a;
+  border-radius: 0 0 20px 20px;
+  z-index: 100;
+}
+
+/* ===== STATUS BAR ===== */
+.status-bar {
+  height: 50px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 24px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--white);
+  position: relative;
+  z-index: 50;
+}
+.status-bar .time { font-size: 14px; font-weight: 700; }
+.status-bar .icons { display: flex; gap: 4px; font-size: 11px; }
+
+/* ===== SCREEN CONTAINER ===== */
+.screen-container {
+  height: calc(var(--phone-height) - 50px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  flex-direction: column;
+  background: var(--bg);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active {
+  display: flex;
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== LANDING / ROLE SELECTOR ===== */
+.screen-landing {
+  background: linear-gradient(160deg, #e8f4f0 0%, #f7f9f8 40%, #fdf3e4 100%);
+  justify-content: center;
+  align-items: center;
+  padding: 40px 28px;
+}
+.logo {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 6px;
+  letter-spacing: -1px;
+}
+.logo span { color: var(--accent); }
+.logo-sub {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 48px;
+}
+.role-cards { display: flex; flex-direction: column; gap: 18px; width: 100%; }
+.role-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 2px solid transparent;
+}
+.role-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.role-card:active { transform: scale(0.98); }
+.role-card .icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.role-card.borger .icon { background: var(--primary-light); }
+.role-card.fysio .icon { background: var(--accent-light); }
+.role-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 3px; }
+.role-card p { font-size: 13px; color: var(--text-light); line-height: 1.4; }
+.role-card .arrow { margin-left: auto; color: var(--text-lighter); font-size: 20px; }
+
+/* ===== BOTTOM TAB BAR ===== */
+.tab-bar {
+  display: flex;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 6px 0 28px;
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
+  z-index: 50;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 0 0;
+  font-size: 10px;
+  color: var(--text-lighter);
+  cursor: pointer;
+  transition: color 0.15s;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab .tab-icon { font-size: 22px; line-height: 1; }
+.tab.active { color: var(--primary); font-weight: 600; }
+.tab .badge {
+  position: absolute;
+  top: 2px;
+  right: calc(50% - 18px);
+  background: var(--danger);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* ===== SCROLLABLE CONTENT ===== */
+.scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 20px 16px;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  padding: 16px 20px 0;
+  background: var(--white);
+}
+.page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+.page-header .subtitle { font-size: 13px; color: var(--text-light); margin-top: 2px; }
+.greeting-date { font-size: 12px; color: var(--text-lighter); margin-bottom: 2px; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+.card-sm { padding: 14px 16px; border-radius: var(--radius-sm); }
+.card-accent {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+}
+.card-accent .card-label { color: rgba(255,255,255,0.75); }
+.card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 8px; }
+
+/* ===== APPOINTMENT CARD ===== */
+.appt-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.appt-card:active { transform: scale(0.98); }
+.appt-date-box {
+  width: 48px;
+  min-width: 48px;
+  text-align: center;
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  padding: 8px 4px;
+}
+.appt-date-box .day { font-size: 20px; font-weight: 800; color: var(--primary-dark); line-height: 1; }
+.appt-date-box .month { font-size: 10px; font-weight: 600; color: var(--primary); text-transform: uppercase; margin-top: 2px; }
+.appt-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+.appt-info p { font-size: 12px; color: var(--text-light); line-height: 1.4; }
+.appt-status {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+.status-confirmed { background: #e8f5e1; color: #4a8c3f; }
+.status-pending { background: #fef3e2; color: #c67b1a; }
+.status-done { background: #e8ecef; color: #636e72; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.15s;
+  font-family: var(--font);
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary { background: var(--primary-light); color: var(--primary-dark); }
+.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+.btn-danger { background: #fde8e8; color: var(--danger); }
+.btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 8px; }
+.btn-block { width: 100%; }
+.btn-group { display: flex; gap: 8px; margin-top: 10px; }
+
+/* ===== QUICK ACTIONS ===== */
+.quick-actions { display: flex; gap: 10px; margin-bottom: 14px; }
+.quick-action {
+  flex: 1;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 16px 12px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.quick-action:active { transform: scale(0.96); }
+.quick-action .qa-icon { font-size: 26px; margin-bottom: 6px; }
+.quick-action .qa-label { font-size: 12px; font-weight: 600; color: var(--text); }
+
+/* ===== SERVICE CARDS ===== */
+.service-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.service-card:active { transform: scale(0.98); }
+.service-icon {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.service-info { flex: 1; }
+.service-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.service-info p { font-size: 12px; color: var(--text-light); line-height: 1.5; margin-bottom: 8px; }
+
+/* ===== EXERCISE ITEMS ===== */
+.exercise-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.exercise-item:last-child { border-bottom: none; }
+.exercise-icon { font-size: 28px; width: 40px; text-align: center; }
+.exercise-info { flex: 1; }
+.exercise-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.exercise-info p { font-size: 11px; color: var(--text-light); }
+.exercise-check {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: transparent;
+  flex-shrink: 0;
+}
+.exercise-check.checked {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+
+/* ===== PROGRESS RING ===== */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.progress-ring {
+  width: 64px; height: 64px;
+  position: relative;
+}
+.progress-ring svg { transform: rotate(-90deg); }
+.progress-ring .bg { stroke: var(--border); }
+.progress-ring .fill { stroke: var(--success); transition: stroke-dashoffset 0.5s ease; }
+.progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--success);
+}
+
+/* ===== PROFILE ===== */
+.profile-header {
+  text-align: center;
+  padding: 20px;
+}
+.avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 12px;
+}
+.profile-header h2 { font-size: 20px; font-weight: 700; }
+.profile-header p { font-size: 13px; color: var(--text-light); }
+.profile-section { margin-bottom: 14px; }
+.profile-section h3 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); padding: 0 4px; margin-bottom: 8px; }
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 16px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  margin-bottom: 2px;
+  font-size: 14px;
+}
+.profile-row:first-of-type { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.profile-row:last-of-type { border-radius: 0 0 var(--radius-sm) var(--radius-sm); margin-bottom: 0; }
+.profile-row:only-of-type { border-radius: var(--radius-sm); }
+.profile-row span:last-child { color: var(--text-light); }
+
+/* ===== FYSIO DASHBOARD ===== */
+.stats-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.stat-card {
+  flex: 1;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-card .stat-num { font-size: 24px; font-weight: 800; color: var(--primary-dark); }
+.stat-card .stat-label { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+
+/* ===== TIMELINE ===== */
+.timeline { position: relative; }
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.timeline-item:active { transform: scale(0.98); }
+.timeline-time {
+  width: 48px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+.timeline-dot {
+  width: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 14px;
+  flex-shrink: 0;
+}
+.timeline-dot::before {
+  content: '';
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.timeline-dot::after {
+  content: '';
+  flex: 1;
+  width: 2px;
+  background: var(--border);
+  margin-top: 4px;
+}
+.timeline-item:last-child .timeline-dot::after { display: none; }
+.timeline-content {
+  flex: 1;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+  border-left: 3px solid var(--primary);
+}
+.timeline-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.timeline-content p { font-size: 12px; color: var(--text-light); }
+.timeline-content.type-hold { border-left-color: var(--accent); }
+.timeline-content.type-vurd { border-left-color: #a29bfe; }
+
+/* ===== WEEK SELECTOR ===== */
+.week-selector {
+  display: flex;
+  gap: 4px;
+  padding: 12px 20px;
+  background: var(--white);
+}
+.week-day {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.week-day .wd-name { font-size: 10px; color: var(--text-lighter); font-weight: 600; text-transform: uppercase; }
+.week-day .wd-num { font-size: 16px; font-weight: 700; color: var(--text-light); margin-top: 2px; }
+.week-day.active { background: var(--primary); }
+.week-day.active .wd-name, .week-day.active .wd-num { color: white; }
+
+/* ===== CLIENT LIST ===== */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: var(--font);
+  background: transparent;
+}
+.client-card {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.client-card:active { transform: scale(0.98); }
+.client-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.client-info { flex: 1; }
+.client-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.client-info p { font-size: 11px; color: var(--text-light); }
+.client-status {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.client-status.active { background: var(--success); }
+.client-status.inactive { background: var(--text-lighter); }
+
+/* ===== LEAD CARDS ===== */
+.lead-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+  border-left: 3px solid var(--accent);
+}
+.lead-card .lead-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.lead-card h4 { font-size: 15px; font-weight: 600; }
+.lead-card .lead-date { font-size: 11px; color: var(--text-lighter); }
+.lead-card .lead-detail { font-size: 12px; color: var(--text-light); margin-bottom: 4px; }
+
+/* ===== ROUTE ===== */
+.route-stop {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+.route-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 28px;
+  flex-shrink: 0;
+}
+.route-marker .marker-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+.route-marker .marker-line {
+  width: 2px;
+  height: 32px;
+  background: var(--primary-light);
+  margin: 4px 0;
+}
+.route-stop:last-child .marker-line { display: none; }
+.route-card {
+  flex: 1;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 6px;
+}
+.route-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.route-card p { font-size: 12px; color: var(--text-light); }
+.route-card .route-meta { display: flex; gap: 12px; margin-top: 6px; font-size: 11px; color: var(--text-light); }
+.map-placeholder {
+  background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+  border-radius: var(--radius);
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  color: var(--text-light);
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+}
+.map-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(90,158,143,0.3) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(232,167,90,0.2) 0%, transparent 40%);
+}
+.map-placeholder .map-icon { font-size: 36px; margin-bottom: 6px; position: relative; }
+.map-placeholder span { position: relative; }
+
+/* ===== MODAL / OVERLAY ===== */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-sheet {
+  background: var(--white);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-height: 85%;
+  overflow-y: auto;
+  padding: 20px;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal-sheet h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+
+/* ===== BOOKING FLOW ===== */
+.booking-step { display: none; }
+.booking-step.active { display: block; }
+.booking-option {
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.15s;
+  font-size: 14px;
+}
+.booking-option:hover { border-color: var(--primary-light); }
+.booking-option.selected { border-color: var(--primary); background: var(--primary-light); }
+.booking-option h4 { font-size: 14px; font-weight: 600; }
+.booking-option p { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.time-slot {
+  padding: 12px;
+  text-align: center;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.time-slot:hover { border-color: var(--primary-light); }
+.time-slot.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); }
+.time-slot.disabled { opacity: 0.35; pointer-events: none; }
+.date-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.date-grid .dg-header { font-size: 10px; font-weight: 600; color: var(--text-lighter); text-transform: uppercase; padding: 4px; }
+.date-cell {
+  padding: 10px 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.date-cell:hover { background: var(--primary-light); }
+.date-cell.selected { background: var(--primary); color: white; font-weight: 700; }
+.date-cell.today { border: 2px solid var(--primary); }
+.date-cell.disabled { opacity: 0.25; pointer-events: none; }
+
+/* ===== BOOKING CONFIRM ===== */
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.confirm-row:last-child { border-bottom: none; }
+.confirm-row .label { color: var(--text-light); }
+.confirm-row .value { font-weight: 600; }
+
+/* ===== SUCCESS STATE ===== */
+.success-state {
+  text-align: center;
+  padding: 30px 20px;
+}
+.success-icon { font-size: 56px; margin-bottom: 16px; }
+.success-state h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.success-state p { font-size: 14px; color: var(--text-light); margin-bottom: 24px; }
+
+/* ===== TIP CARD ===== */
+.tip-card {
+  background: var(--accent-light);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.tip-icon { font-size: 22px; flex-shrink: 0; padding-top: 2px; }
+.tip-content h4 { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
+.tip-content p { font-size: 12px; color: var(--text-light); line-height: 1.5; }
+
+/* ===== COLLAPSIBLE ===== */
+.collapsible-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px 0;
+}
+.collapsible-header h3 { font-size: 14px; font-weight: 600; color: var(--text-light); }
+.collapsible-header .arrow { transition: transform 0.2s; font-size: 14px; color: var(--text-lighter); }
+.collapsible-header.open .arrow { transform: rotate(180deg); }
+.collapsible-body { display: none; }
+.collapsible-body.open { display: block; }
+
+/* ===== CLIENT DETAIL ===== */
+.detail-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+.detail-back:active { opacity: 0.7; }
+
+/* ===== MISC ===== */
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-light);
+  margin: 18px 0 10px;
+}
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-lighter);
+}
+.divider { height: 1px; background: var(--border); margin: 14px 0; }
+.text-sm { font-size: 12px; }
+.text-light { color: var(--text-light); }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.fw-600 { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="app">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="icons">
+      <span>●●●●○</span>
+      <span>WiFi</span>
+      <span>🔋</span>
+    </span>
+  </div>
+
+  <div class="screen-container">
+
+    <!-- ==================== LANDING ==================== -->
+    <div class="screen screen-landing active" id="screen-landing">
+      <div class="logo">Fysio<span>Hjem</span></div>
+      <div class="logo-sub">Fysioterapi i dit hjem</div>
+      <div class="role-cards">
+        <div class="role-card borger" onclick="selectRole('borger')">
+          <div class="icon">🏠</div>
+          <div>
+            <h3>Jeg er borger</h3>
+            <p>Book behandling, se øvelser og hold styr på dine aftaler</p>
+          </div>
+          <span class="arrow">›</span>
+        </div>
+        <div class="role-card fysio" onclick="selectRole('fysio')">
+          <div class="icon">💼</div>
+          <div>
+            <h3>Jeg er fysioterapeut</h3>
+            <p>Administrer klienter, aftaler og din daglige rute</p>
+          </div>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== BORGER SCREENS ==================== -->
+
+    <!-- B1: Hjem -->
+    <div class="screen" id="screen-b-hjem">
+      <div class="page-header">
+        <p class="greeting-date">Søndag d. 8. marts 2026</p>
+        <h1>God morgen, Inger 👋</h1>
+      </div>
+      <div class="scroll-content">
+        <div class="card card-accent mb-16">
+          <div class="card-label">Næste aftale</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div>
+              <div style="font-size:18px;font-weight:700;">Tirsdag d. 10. mar</div>
+              <div style="font-size:14px;opacity:0.85;margin-top:4px;">kl. 10:00 — Individuel behandling</div>
+              <div style="font-size:13px;opacity:0.7;margin-top:2px;">Karen Goetsche</div>
+            </div>
+            <div style="font-size:32px;">🦴</div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <div class="quick-action" onclick="openBooking()">
+            <div class="qa-icon">📅</div>
+            <div class="qa-label">Book tid</div>
+          </div>
+          <div class="quick-action" onclick="switchTab('borger', 3)">
+            <div class="qa-icon">🏋️</div>
+            <div class="qa-label">Mine øvelser</div>
+          </div>
+        </div>
+
+        <div class="tip-card">
+          <div class="tip-icon">💡</div>
+          <div class="tip-content">
+            <h4>Dagens tip</h4>
+            <p>Prøv at rejse dig fra stolen 5 gange uden at bruge armene. Det styrker dine ben og forbedrer din balance.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Borger Tab Bar -->
+      <div class="tab-bar" id="tab-bar-borger">
+        <div class="tab active" onclick="switchTab('borger', 0)">
+          <span class="tab-icon">🏠</span>
+          <span>Hjem</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 1)">
+          <span class="tab-icon">🩺</span>
+          <span>Tjenester</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 2)">
+          <span class="tab-icon">📋</span>
+          <span>Aftaler</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 3)">
+          <span class="tab-icon">🏋️</span>
+          <span>Øvelser</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 4)">
+          <span class="tab-icon">👤</span>
+          <span>Profil</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B2: Tjenester -->
+    <div class="screen" id="screen-b-tjenester">
+      <div class="page-header">
+        <h1>Tjenester</h1>
+        <p class="subtitle">Vælg en behandling og book din tid</p>
+      </div>
+      <div class="scroll-content">
+        <div class="service-card" onclick="openBookingWithService('Individuel behandling')">
+          <div class="service-icon">🤲</div>
+          <div class="service-info">
+            <h4>Individuel behandling</h4>
+            <p>Smertelindring, mobilitetstræning og personlig genoptræning tilpasset dine behov.</p>
+            <button class="btn btn-primary btn-sm">Book tid</button>
+          </div>
+        </div>
+        <div class="service-card" onclick="openBookingWithService('Holdtræning')">
+          <div class="service-icon">👥</div>
+          <div class="service-info">
+            <h4>Holdtræning</h4>
+            <p>Stolegymnastik, balancetræning og blid bevægelse i små grupper.</p>
+            <button class="btn btn-primary btn-sm">Book tid</button>
+          </div>
+        </div>
+        <div class="service-card" onclick="openBookingWithService('Øvelsesprogram')">
+          <div class="service-icon">📝</div>
+          <div class="service-info">
+            <h4>Øvelsesprogram</h4>
+            <p>Personlige øvelser du kan lave mellem besøg. Instruktion og opfølgning.</p>
+            <button class="btn btn-primary btn-sm">Book tid</button>
+          </div>
+        </div>
+        <div class="service-card" onclick="openBookingWithService('Helbredsvurdering')">
+          <div class="service-icon">📊</div>
+          <div class="service-info">
+            <h4>Helbredsvurdering</h4>
+            <p>Funktionsscreening, vurdering og individuel handleplan for din fremgang.</p>
+            <button class="btn btn-primary btn-sm">Book tid</button>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="switchTab('borger', 0)">
+          <span class="tab-icon">🏠</span><span>Hjem</span>
+        </div>
+        <div class="tab active" onclick="switchTab('borger', 1)">
+          <span class="tab-icon">🩺</span><span>Tjenester</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 2)">
+          <span class="tab-icon">📋</span><span>Aftaler</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 3)">
+          <span class="tab-icon">🏋️</span><span>Øvelser</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 4)">
+          <span class="tab-icon">👤</span><span>Profil</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B3: Mine aftaler -->
+    <div class="screen" id="screen-b-aftaler">
+      <div class="page-header">
+        <h1>Mine aftaler</h1>
+        <p class="subtitle">Kommende og tidligere aftaler</p>
+      </div>
+      <div class="scroll-content">
+        <div class="section-title" style="margin-top:4px;">Kommende</div>
+        <div class="card card-sm">
+          <div class="appt-card">
+            <div class="appt-date-box">
+              <div class="day">10</div>
+              <div class="month">Mar</div>
+            </div>
+            <div class="appt-info">
+              <h4>Individuel behandling</h4>
+              <p>kl. 10:00 — Karen Goetsche</p>
+              <span class="appt-status status-confirmed">Bekræftet</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm">
+          <div class="appt-card">
+            <div class="appt-date-box">
+              <div class="day">17</div>
+              <div class="month">Mar</div>
+            </div>
+            <div class="appt-info">
+              <h4>Holdtræning</h4>
+              <p>kl. 14:00 — Karen Goetsche</p>
+              <span class="appt-status status-pending">Afventer</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm">
+          <div class="appt-card">
+            <div class="appt-date-box">
+              <div class="day">24</div>
+              <div class="month">Mar</div>
+            </div>
+            <div class="appt-info">
+              <h4>Individuel behandling</h4>
+              <p>kl. 10:00 — Karen Goetsche</p>
+              <span class="appt-status status-confirmed">Bekræftet</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="collapsible-header" onclick="toggleCollapsible(this)">
+          <h3>Tidligere aftaler</h3>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="collapsible-body">
+          <div class="card card-sm">
+            <div class="appt-card">
+              <div class="appt-date-box" style="background:#e8ecef;">
+                <div class="day" style="color:#636e72;">3</div>
+                <div class="month" style="color:#636e72;">Mar</div>
+              </div>
+              <div class="appt-info">
+                <h4>Individuel behandling</h4>
+                <p>kl. 10:00 — Karen Goetsche</p>
+                <span class="appt-status status-done">Gennemført</span>
+              </div>
+            </div>
+          </div>
+          <div class="card card-sm">
+            <div class="appt-card">
+              <div class="appt-date-box" style="background:#e8ecef;">
+                <div class="day" style="color:#636e72;">24</div>
+                <div class="month" style="color:#636e72;">Feb</div>
+              </div>
+              <div class="appt-info">
+                <h4>Helbredsvurdering</h4>
+                <p>kl. 09:30 — Karen Goetsche</p>
+                <span class="appt-status status-done">Gennemført</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="switchTab('borger', 0)">
+          <span class="tab-icon">🏠</span><span>Hjem</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 1)">
+          <span class="tab-icon">🩺</span><span>Tjenester</span>
+        </div>
+        <div class="tab active" onclick="switchTab('borger', 2)">
+          <span class="tab-icon">📋</span><span>Aftaler</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 3)">
+          <span class="tab-icon">🏋️</span><span>Øvelser</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 4)">
+          <span class="tab-icon">👤</span><span>Profil</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B4: Mine øvelser -->
+    <div class="screen" id="screen-b-oevelser">
+      <div class="page-header">
+        <h1>Mine øvelser</h1>
+        <p class="subtitle">Dit personlige træningsprogram</p>
+      </div>
+      <div class="scroll-content">
+        <div class="card mb-16">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <div class="card-label">Aktiv plan</div>
+              <div style="font-size:15px;font-weight:600;">Styrke & Balance</div>
+              <div style="font-size:12px;color:var(--text-light);">Af Karen Goetsche</div>
+            </div>
+            <div class="progress-ring">
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <circle class="bg" cx="32" cy="32" r="26" fill="none" stroke-width="6"/>
+                <circle class="fill" cx="32" cy="32" r="26" fill="none" stroke-width="6"
+                  stroke-dasharray="163.36" stroke-dashoffset="49" stroke-linecap="round"
+                  id="progress-circle"/>
+              </svg>
+              <div class="progress-text" id="progress-text">5/7</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text-lighter);">Ugentlig fremgang — godt gået! 💪</div>
+        </div>
+
+        <div class="card">
+          <div class="exercise-item">
+            <div class="exercise-icon">🦵</div>
+            <div class="exercise-info">
+              <h4>Stoleoprejsning</h4>
+              <p>3 sæt × 8 gentagelser</p>
+            </div>
+            <div class="exercise-check checked" onclick="toggleExercise(this)">✓</div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-icon">🧘</div>
+            <div class="exercise-info">
+              <h4>Siddende stræk</h4>
+              <p>Hold 20 sek × 4 gentagelser</p>
+            </div>
+            <div class="exercise-check checked" onclick="toggleExercise(this)">✓</div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-icon">🚶</div>
+            <div class="exercise-info">
+              <h4>Hælhævning</h4>
+              <p>3 sæt × 12 gentagelser</p>
+            </div>
+            <div class="exercise-check checked" onclick="toggleExercise(this)">✓</div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-icon">⚖️</div>
+            <div class="exercise-info">
+              <h4>Et-bens balance</h4>
+              <p>Hold 15 sek × 3 pr. ben</p>
+            </div>
+            <div class="exercise-check checked" onclick="toggleExercise(this)">✓</div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-icon">💪</div>
+            <div class="exercise-info">
+              <h4>Vægtløft med dåser</h4>
+              <p>2 sæt × 10 gentagelser</p>
+            </div>
+            <div class="exercise-check checked" onclick="toggleExercise(this)">✓</div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-icon">🔄</div>
+            <div class="exercise-info">
+              <h4>Skulderrotation</h4>
+              <p>2 sæt × 10 hver retning</p>
+            </div>
+            <div class="exercise-check" onclick="toggleExercise(this)">✓</div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-icon">🫁</div>
+            <div class="exercise-info">
+              <h4>Vejrtrækningsøvelse</h4>
+              <p>5 min — dyb vejrtrækning</p>
+            </div>
+            <div class="exercise-check" onclick="toggleExercise(this)">✓</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="switchTab('borger', 0)">
+          <span class="tab-icon">🏠</span><span>Hjem</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 1)">
+          <span class="tab-icon">🩺</span><span>Tjenester</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 2)">
+          <span class="tab-icon">📋</span><span>Aftaler</span>
+        </div>
+        <div class="tab active" onclick="switchTab('borger', 3)">
+          <span class="tab-icon">🏋️</span><span>Øvelser</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 4)">
+          <span class="tab-icon">👤</span><span>Profil</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B5: Profil -->
+    <div class="screen" id="screen-b-profil">
+      <div class="scroll-content">
+        <div class="profile-header">
+          <div class="avatar">👵</div>
+          <h2>Inger Mortensen</h2>
+          <p>Skovly Plejecenter</p>
+        </div>
+        <div class="profile-section">
+          <h3>Kontaktoplysninger</h3>
+          <div class="profile-row"><span>Telefon</span><span>28 43 67 91</span></div>
+          <div class="profile-row"><span>E-mail</span><span>inger.m@mail.dk</span></div>
+          <div class="profile-row"><span>Adresse</span><span>Stue 12, Skovly</span></div>
+        </div>
+        <div class="profile-section">
+          <h3>Nødkontakt</h3>
+          <div class="profile-row"><span>Navn</span><span>Peter Mortensen</span></div>
+          <div class="profile-row"><span>Relation</span><span>Søn</span></div>
+          <div class="profile-row"><span>Telefon</span><span>40 12 34 56</span></div>
+        </div>
+        <div class="profile-section">
+          <h3>Indstillinger</h3>
+          <div class="profile-row"><span>Sprog</span><span>Dansk</span></div>
+          <div class="profile-row"><span>Notifikationer</span><span>Til</span></div>
+          <div class="profile-row"><span>Skriftstørrelse</span><span>Stor</span></div>
+        </div>
+        <button class="btn btn-danger btn-block mt-16" onclick="logout()">Log ud</button>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="switchTab('borger', 0)">
+          <span class="tab-icon">🏠</span><span>Hjem</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 1)">
+          <span class="tab-icon">🩺</span><span>Tjenester</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 2)">
+          <span class="tab-icon">📋</span><span>Aftaler</span>
+        </div>
+        <div class="tab" onclick="switchTab('borger', 3)">
+          <span class="tab-icon">🏋️</span><span>Øvelser</span>
+        </div>
+        <div class="tab active" onclick="switchTab('borger', 4)">
+          <span class="tab-icon">👤</span><span>Profil</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FYSIO SCREENS ==================== -->
+
+    <!-- F1: Overblik -->
+    <div class="screen" id="screen-f-overblik">
+      <div class="page-header">
+        <p class="greeting-date">Søndag d. 8. marts 2026</p>
+        <h1>God morgen, Karen 👋</h1>
+      </div>
+      <div class="scroll-content">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num">6</div>
+            <div class="stat-label">Aftaler i dag</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">3</div>
+            <div class="stat-label">Nye leads</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">24</div>
+            <div class="stat-label">Aktive borgere</div>
+          </div>
+        </div>
+
+        <div class="section-title">Dagens program</div>
+        <div class="timeline">
+          <div class="timeline-item" onclick="showApptDetail('Inger Mortensen','Skovly Plejecenter','Individuel behandling','09:00 – 09:45','Bekræftet')">
+            <div class="timeline-time">09:00</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h4>Inger Mortensen</h4>
+              <p>Individuel behandling · Skovly</p>
+            </div>
+          </div>
+          <div class="timeline-item" onclick="showApptDetail('Hans Jensen','Skovly Plejecenter','Individuel behandling','10:00 – 10:45','Bekræftet')">
+            <div class="timeline-time">10:00</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h4>Hans Jensen</h4>
+              <p>Individuel behandling · Skovly</p>
+            </div>
+          </div>
+          <div class="timeline-item" onclick="showApptDetail('Holdtræning','Skovly Plejecenter','Stolegymnastik (6 deltagere)','11:00 – 11:45','Bekræftet')">
+            <div class="timeline-time">11:00</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content type-hold">
+              <h4>Holdtræning</h4>
+              <p>Stolegymnastik · Skovly (6 deltagere)</p>
+            </div>
+          </div>
+          <div class="timeline-item" onclick="showApptDetail('Birthe Andersen','Bakkegården','Individuel behandling','13:30 – 14:15','Bekræftet')">
+            <div class="timeline-time">13:30</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h4>Birthe Andersen</h4>
+              <p>Individuel behandling · Bakkegården</p>
+            </div>
+          </div>
+          <div class="timeline-item" onclick="showApptDetail('Erik Larsen','Bakkegården','Helbredsvurdering','14:30 – 15:15','Afventer')">
+            <div class="timeline-time">14:30</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content type-vurd">
+              <h4>Erik Larsen</h4>
+              <p>Helbredsvurdering · Bakkegården</p>
+            </div>
+          </div>
+          <div class="timeline-item" onclick="showApptDetail('Grethe Nielsen','Solhaven','Individuel behandling','16:00 – 16:45','Bekræftet')">
+            <div class="timeline-time">16:00</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h4>Grethe Nielsen</h4>
+              <p>Individuel behandling · Solhaven</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions mt-16">
+          <div class="quick-action" onclick="switchTab('fysio', 2)">
+            <div class="qa-icon">➕</div>
+            <div class="qa-label">Tilføj borger</div>
+          </div>
+          <div class="quick-action" onclick="switchTab('fysio', 4)">
+            <div class="qa-icon">🗺️</div>
+            <div class="qa-label">Se rute</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar" id="tab-bar-fysio">
+        <div class="tab active" onclick="switchTab('fysio', 0)">
+          <span class="tab-icon">📊</span><span>Overblik</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 1)">
+          <span class="tab-icon">📅</span><span>Aftaler</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 2)">
+          <span class="tab-icon">👥</span><span>Borgere</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 3)">
+          <span class="tab-icon">📨</span><span>Leads</span>
+          <span class="badge">3</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 4)">
+          <span class="tab-icon">🗺️</span><span>Rute</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F2: Aftaler (Calendar) -->
+    <div class="screen" id="screen-f-aftaler">
+      <div class="page-header">
+        <h1>Aftaler</h1>
+        <p class="subtitle">Uge 11 — marts 2026</p>
+      </div>
+      <div class="week-selector">
+        <div class="week-day" onclick="selectWeekDay(this)"><div class="wd-name">Man</div><div class="wd-num">9</div></div>
+        <div class="week-day" onclick="selectWeekDay(this)"><div class="wd-name">Tir</div><div class="wd-num">10</div></div>
+        <div class="week-day" onclick="selectWeekDay(this)"><div class="wd-name">Ons</div><div class="wd-num">11</div></div>
+        <div class="week-day" onclick="selectWeekDay(this)"><div class="wd-name">Tor</div><div class="wd-num">12</div></div>
+        <div class="week-day" onclick="selectWeekDay(this)"><div class="wd-name">Fre</div><div class="wd-num">13</div></div>
+        <div class="week-day active" onclick="selectWeekDay(this)"><div class="wd-name">Lør</div><div class="wd-num">14</div></div>
+        <div class="week-day" onclick="selectWeekDay(this)"><div class="wd-name">Søn</div><div class="wd-num">15</div></div>
+      </div>
+      <div class="scroll-content">
+        <div class="card card-sm mb-8" onclick="showApptDetail('Inger Mortensen','Skovly Plejecenter','Individuel behandling','09:00 – 09:45','Bekræftet')">
+          <div class="appt-card">
+            <div class="appt-date-box">
+              <div class="day" style="font-size:14px;">09:00</div>
+              <div class="month">45 min</div>
+            </div>
+            <div class="appt-info">
+              <h4>Inger Mortensen</h4>
+              <p>Individuel behandling · Skovly</p>
+              <span class="appt-status status-confirmed">Bekræftet</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm mb-8" onclick="showApptDetail('Hans Jensen','Skovly Plejecenter','Individuel behandling','10:00 – 10:45','Bekræftet')">
+          <div class="appt-card">
+            <div class="appt-date-box">
+              <div class="day" style="font-size:14px;">10:00</div>
+              <div class="month">45 min</div>
+            </div>
+            <div class="appt-info">
+              <h4>Hans Jensen</h4>
+              <p>Individuel behandling · Skovly</p>
+              <span class="appt-status status-confirmed">Bekræftet</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm mb-8">
+          <div class="appt-card">
+            <div class="appt-date-box" style="background:var(--accent-light);">
+              <div class="day" style="font-size:14px;color:var(--accent);">11:00</div>
+              <div class="month" style="color:var(--accent);">45 min</div>
+            </div>
+            <div class="appt-info">
+              <h4>Holdtræning — Stolegymnastik</h4>
+              <p>Skovly · 6 deltagere</p>
+              <span class="appt-status status-confirmed">Bekræftet</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm mb-8" onclick="showApptDetail('Birthe Andersen','Bakkegården','Individuel behandling','13:30 – 14:15','Bekræftet')">
+          <div class="appt-card">
+            <div class="appt-date-box">
+              <div class="day" style="font-size:14px;">13:30</div>
+              <div class="month">45 min</div>
+            </div>
+            <div class="appt-info">
+              <h4>Birthe Andersen</h4>
+              <p>Individuel behandling · Bakkegården</p>
+              <span class="appt-status status-confirmed">Bekræftet</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm mb-8" onclick="showApptDetail('Erik Larsen','Bakkegården','Helbredsvurdering','14:30 – 15:15','Afventer')">
+          <div class="appt-card">
+            <div class="appt-date-box" style="background:#ede7f6;">
+              <div class="day" style="font-size:14px;color:#7c4dff;">14:30</div>
+              <div class="month" style="color:#7c4dff;">45 min</div>
+            </div>
+            <div class="appt-info">
+              <h4>Erik Larsen</h4>
+              <p>Helbredsvurdering · Bakkegården</p>
+              <span class="appt-status status-pending">Afventer</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm mb-8" onclick="showApptDetail('Grethe Nielsen','Solhaven','Individuel behandling','16:00 – 16:45','Bekræftet')">
+          <div class="appt-card">
+            <div class="appt-date-box">
+              <div class="day" style="font-size:14px;">16:00</div>
+              <div class="month">45 min</div>
+            </div>
+            <div class="appt-info">
+              <h4>Grethe Nielsen</h4>
+              <p>Individuel behandling · Solhaven</p>
+              <span class="appt-status status-confirmed">Bekræftet</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="switchTab('fysio', 0)">
+          <span class="tab-icon">📊</span><span>Overblik</span>
+        </div>
+        <div class="tab active" onclick="switchTab('fysio', 1)">
+          <span class="tab-icon">📅</span><span>Aftaler</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 2)">
+          <span class="tab-icon">👥</span><span>Borgere</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 3)">
+          <span class="tab-icon">📨</span><span>Leads</span>
+          <span class="badge">3</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 4)">
+          <span class="tab-icon">🗺️</span><span>Rute</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F3: Borgere (Clients) -->
+    <div class="screen" id="screen-f-borgere">
+      <div class="page-header">
+        <h1>Borgere</h1>
+        <p class="subtitle">24 aktive borgere</p>
+      </div>
+      <div class="scroll-content">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Søg borger..." oninput="filterClients(this.value)">
+        </div>
+        <div id="client-list">
+          <div class="client-card" onclick="showClientDetail('Inger Mortensen','Skovly Plejecenter','Sidst: 3. mar','Næste: 10. mar, kl. 10:00')">
+            <div class="client-avatar">👵</div>
+            <div class="client-info">
+              <h4>Inger Mortensen</h4>
+              <p>Skovly Plejecenter · Sidst: 3. mar</p>
+            </div>
+            <div class="client-status active"></div>
+          </div>
+          <div class="client-card" onclick="showClientDetail('Hans Jensen','Skovly Plejecenter','Sidst: 5. mar','Næste: 14. mar, kl. 10:00')">
+            <div class="client-avatar">👴</div>
+            <div class="client-info">
+              <h4>Hans Jensen</h4>
+              <p>Skovly Plejecenter · Sidst: 5. mar</p>
+            </div>
+            <div class="client-status active"></div>
+          </div>
+          <div class="client-card" onclick="showClientDetail('Birthe Andersen','Bakkegården','Sidst: 1. mar','Næste: 14. mar, kl. 13:30')">
+            <div class="client-avatar">👵</div>
+            <div class="client-info">
+              <h4>Birthe Andersen</h4>
+              <p>Bakkegården · Sidst: 1. mar</p>
+            </div>
+            <div class="client-status active"></div>
+          </div>
+          <div class="client-card" onclick="showClientDetail('Erik Larsen','Bakkegården','Sidst: 28. feb','Næste: 14. mar, kl. 14:30')">
+            <div class="client-avatar">👴</div>
+            <div class="client-info">
+              <h4>Erik Larsen</h4>
+              <p>Bakkegården · Sidst: 28. feb</p>
+            </div>
+            <div class="client-status active"></div>
+          </div>
+          <div class="client-card" onclick="showClientDetail('Grethe Nielsen','Solhaven','Sidst: 6. mar','Næste: 14. mar, kl. 16:00')">
+            <div class="client-avatar">👵</div>
+            <div class="client-info">
+              <h4>Grethe Nielsen</h4>
+              <p>Solhaven · Sidst: 6. mar</p>
+            </div>
+            <div class="client-status active"></div>
+          </div>
+          <div class="client-card" onclick="showClientDetail('Knud Pedersen','Solhaven','Sidst: 4. mar','Næste: 18. mar, kl. 10:00')">
+            <div class="client-avatar">👴</div>
+            <div class="client-info">
+              <h4>Knud Pedersen</h4>
+              <p>Solhaven · Sidst: 4. mar</p>
+            </div>
+            <div class="client-status active"></div>
+          </div>
+          <div class="client-card">
+            <div class="client-avatar">👵</div>
+            <div class="client-info">
+              <h4>Else Rasmussen</h4>
+              <p>Skovly Plejecenter · Sidst: 20. feb</p>
+            </div>
+            <div class="client-status inactive"></div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="switchTab('fysio', 0)">
+          <span class="tab-icon">📊</span><span>Overblik</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 1)">
+          <span class="tab-icon">📅</span><span>Aftaler</span>
+        </div>
+        <div class="tab active" onclick="switchTab('fysio', 2)">
+          <span class="tab-icon">👥</span><span>Borgere</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 3)">
+          <span class="tab-icon">📨</span><span>Leads</span>
+          <span class="badge">3</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 4)">
+          <span class="tab-icon">🗺️</span><span>Rute</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F4: Nye henvendelser (Leads) -->
+    <div class="screen" id="screen-f-leads">
+      <div class="page-header">
+        <h1>Nye henvendelser</h1>
+        <p class="subtitle">3 afventer svar</p>
+      </div>
+      <div class="scroll-content">
+        <div class="lead-card">
+          <div class="lead-header">
+            <h4>Margit Holm</h4>
+            <span class="lead-date">6. mar 2026</span>
+          </div>
+          <p class="lead-detail">🏠 Rosenhaven Plejecenter</p>
+          <p class="lead-detail">🩺 Individuel behandling — smerter i ryg og hofte</p>
+          <div class="btn-group">
+            <button class="btn btn-secondary btn-sm" onclick="handleLead(this, 'ring')">📞 Ring op</button>
+            <button class="btn btn-primary btn-sm" onclick="handleLead(this, 'book')">📅 Book vurdering</button>
+            <button class="btn btn-outline btn-sm" onclick="handleLead(this, 'afvis')">Afvis</button>
+          </div>
+        </div>
+        <div class="lead-card">
+          <div class="lead-header">
+            <h4>Poul Christiansen</h4>
+            <span class="lead-date">5. mar 2026</span>
+          </div>
+          <p class="lead-detail">🏠 Bakkegården</p>
+          <p class="lead-detail">🩺 Helbredsvurdering — henvist fra læge</p>
+          <div class="btn-group">
+            <button class="btn btn-secondary btn-sm" onclick="handleLead(this, 'ring')">📞 Ring op</button>
+            <button class="btn btn-primary btn-sm" onclick="handleLead(this, 'book')">📅 Book vurdering</button>
+            <button class="btn btn-outline btn-sm" onclick="handleLead(this, 'afvis')">Afvis</button>
+          </div>
+        </div>
+        <div class="lead-card">
+          <div class="lead-header">
+            <h4>Lisbeth Sørensen</h4>
+            <span class="lead-date">4. mar 2026</span>
+          </div>
+          <p class="lead-detail">🏠 Solhaven</p>
+          <p class="lead-detail">🩺 Holdtræning — ønsker stolegymnastik</p>
+          <div class="btn-group">
+            <button class="btn btn-secondary btn-sm" onclick="handleLead(this, 'ring')">📞 Ring op</button>
+            <button class="btn btn-primary btn-sm" onclick="handleLead(this, 'book')">📅 Book vurdering</button>
+            <button class="btn btn-outline btn-sm" onclick="handleLead(this, 'afvis')">Afvis</button>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="switchTab('fysio', 0)">
+          <span class="tab-icon">📊</span><span>Overblik</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 1)">
+          <span class="tab-icon">📅</span><span>Aftaler</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 2)">
+          <span class="tab-icon">👥</span><span>Borgere</span>
+        </div>
+        <div class="tab active" onclick="switchTab('fysio', 3)">
+          <span class="tab-icon">📨</span><span>Leads</span>
+          <span class="badge">3</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 4)">
+          <span class="tab-icon">🗺️</span><span>Rute</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- F5: Rute -->
+    <div class="screen" id="screen-f-rute">
+      <div class="page-header">
+        <h1>Dagens rute</h1>
+        <p class="subtitle">3 plejecentre · 6 aftaler</p>
+      </div>
+      <div class="scroll-content">
+        <div class="map-placeholder">
+          <div class="map-icon">🗺️</div>
+          <span>Rutevisning</span>
+        </div>
+
+        <div class="route-stop">
+          <div class="route-marker">
+            <div class="marker-dot">1</div>
+            <div class="marker-line"></div>
+          </div>
+          <div class="route-card">
+            <h4>Skovly Plejecenter</h4>
+            <p>Skovvej 12, 8000 Aarhus C</p>
+            <div class="route-meta">
+              <span>🕐 09:00 – 11:45</span>
+              <span>👥 3 aftaler</span>
+            </div>
+          </div>
+        </div>
+        <div class="route-stop">
+          <div class="route-marker">
+            <div class="marker-dot">2</div>
+            <div class="marker-line"></div>
+          </div>
+          <div class="route-card">
+            <h4>Bakkegården</h4>
+            <p>Bakkedraget 5, 8200 Aarhus N</p>
+            <div class="route-meta">
+              <span>🕐 13:30 – 15:15</span>
+              <span>👥 2 aftaler</span>
+            </div>
+          </div>
+        </div>
+        <div class="route-stop">
+          <div class="route-marker">
+            <div class="marker-dot">3</div>
+          </div>
+          <div class="route-card">
+            <h4>Solhaven</h4>
+            <p>Solbakken 8, 8210 Aarhus V</p>
+            <div class="route-meta">
+              <span>🕐 16:00 – 16:45</span>
+              <span>👥 1 aftale</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block mt-16" onclick="alert('Navigation startet! (simuleret)')">
+          🧭 Start navigation
+        </button>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="switchTab('fysio', 0)">
+          <span class="tab-icon">📊</span><span>Overblik</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 1)">
+          <span class="tab-icon">📅</span><span>Aftaler</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 2)">
+          <span class="tab-icon">👥</span><span>Borgere</span>
+        </div>
+        <div class="tab" onclick="switchTab('fysio', 3)">
+          <span class="tab-icon">📨</span><span>Leads</span>
+          <span class="badge">3</span>
+        </div>
+        <div class="tab active" onclick="switchTab('fysio', 4)">
+          <span class="tab-icon">🗺️</span><span>Rute</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay" id="modal-booking">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+
+        <!-- Step 1: Service -->
+        <div class="booking-step active" id="booking-step-1">
+          <h2>Vælg behandling</h2>
+          <div class="booking-option" onclick="selectBookingService(this, 'Individuel behandling')">
+            <h4>🤲 Individuel behandling</h4>
+            <p>Smertelindring og mobilitetstræning</p>
+          </div>
+          <div class="booking-option" onclick="selectBookingService(this, 'Holdtræning')">
+            <h4>👥 Holdtræning</h4>
+            <p>Stolegymnastik og balancetræning</p>
+          </div>
+          <div class="booking-option" onclick="selectBookingService(this, 'Øvelsesprogram')">
+            <h4>📝 Øvelsesprogram</h4>
+            <p>Personlige øvelser og instruktion</p>
+          </div>
+          <div class="booking-option" onclick="selectBookingService(this, 'Helbredsvurdering')">
+            <h4>📊 Helbredsvurdering</h4>
+            <p>Funktionsscreening og handleplan</p>
+          </div>
+          <div class="btn-group" style="margin-top:16px;">
+            <button class="btn btn-outline btn-block" onclick="closeBooking()">Annuller</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Date -->
+        <div class="booking-step" id="booking-step-2">
+          <h2>Vælg dato</h2>
+          <p class="text-sm text-light mb-16">Marts 2026</p>
+          <div class="date-grid">
+            <div class="dg-header">Man</div><div class="dg-header">Tir</div><div class="dg-header">Ons</div>
+            <div class="dg-header">Tor</div><div class="dg-header">Fre</div><div class="dg-header">Lør</div><div class="dg-header">Søn</div>
+            <!-- Week 1 (starts Sunday) - offset -->
+            <div class="date-cell disabled"></div>
+            <div class="date-cell disabled"></div>
+            <div class="date-cell disabled"></div>
+            <div class="date-cell disabled"></div>
+            <div class="date-cell disabled"></div>
+            <div class="date-cell disabled"></div>
+            <div class="date-cell disabled">1</div>
+            <!-- Week 2 -->
+            <div class="date-cell disabled">2</div>
+            <div class="date-cell disabled">3</div>
+            <div class="date-cell disabled">4</div>
+            <div class="date-cell disabled">5</div>
+            <div class="date-cell disabled">6</div>
+            <div class="date-cell disabled">7</div>
+            <div class="date-cell today" onclick="selectDate(this, 8)">8</div>
+            <!-- Week 3 -->
+            <div class="date-cell" onclick="selectDate(this, 9)">9</div>
+            <div class="date-cell" onclick="selectDate(this, 10)">10</div>
+            <div class="date-cell" onclick="selectDate(this, 11)">11</div>
+            <div class="date-cell" onclick="selectDate(this, 12)">12</div>
+            <div class="date-cell" onclick="selectDate(this, 13)">13</div>
+            <div class="date-cell disabled">14</div>
+            <div class="date-cell disabled">15</div>
+            <!-- Week 4 -->
+            <div class="date-cell" onclick="selectDate(this, 16)">16</div>
+            <div class="date-cell" onclick="selectDate(this, 17)">17</div>
+            <div class="date-cell" onclick="selectDate(this, 18)">18</div>
+            <div class="date-cell" onclick="selectDate(this, 19)">19</div>
+            <div class="date-cell" onclick="selectDate(this, 20)">20</div>
+            <div class="date-cell disabled">21</div>
+            <div class="date-cell disabled">22</div>
+            <!-- Week 5 -->
+            <div class="date-cell" onclick="selectDate(this, 23)">23</div>
+            <div class="date-cell" onclick="selectDate(this, 24)">24</div>
+            <div class="date-cell" onclick="selectDate(this, 25)">25</div>
+            <div class="date-cell" onclick="selectDate(this, 26)">26</div>
+            <div class="date-cell" onclick="selectDate(this, 27)">27</div>
+            <div class="date-cell disabled">28</div>
+            <div class="date-cell disabled">29</div>
+            <!-- Week 6 -->
+            <div class="date-cell" onclick="selectDate(this, 30)">30</div>
+            <div class="date-cell" onclick="selectDate(this, 31)">31</div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline" onclick="goBookingStep(1)">← Tilbage</button>
+            <button class="btn btn-primary" style="flex:1;" onclick="goBookingStep(3)" id="btn-date-next" disabled>Vælg tid →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Time -->
+        <div class="booking-step" id="booking-step-3">
+          <h2>Vælg tidspunkt</h2>
+          <p class="text-sm text-light mb-16" id="selected-date-label">Dato valgt</p>
+          <div class="time-grid">
+            <div class="time-slot" onclick="selectTime(this, '09:00')">09:00</div>
+            <div class="time-slot" onclick="selectTime(this, '09:30')">09:30</div>
+            <div class="time-slot disabled">10:00</div>
+            <div class="time-slot" onclick="selectTime(this, '10:30')">10:30</div>
+            <div class="time-slot" onclick="selectTime(this, '11:00')">11:00</div>
+            <div class="time-slot disabled">11:30</div>
+            <div class="time-slot" onclick="selectTime(this, '13:00')">13:00</div>
+            <div class="time-slot" onclick="selectTime(this, '13:30')">13:30</div>
+            <div class="time-slot" onclick="selectTime(this, '14:00')">14:00</div>
+            <div class="time-slot" onclick="selectTime(this, '14:30')">14:30</div>
+            <div class="time-slot" onclick="selectTime(this, '15:00')">15:00</div>
+            <div class="time-slot disabled">15:30</div>
+          </div>
+          <div class="btn-group mt-16">
+            <button class="btn btn-outline" onclick="goBookingStep(2)">← Tilbage</button>
+            <button class="btn btn-primary" style="flex:1;" onclick="goBookingStep(4)" id="btn-time-next" disabled>Bekræft →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Confirm -->
+        <div class="booking-step" id="booking-step-4">
+          <h2>Bekræft booking</h2>
+          <div class="card mb-16" style="background:var(--bg);">
+            <div class="confirm-row">
+              <span class="label">Behandling</span>
+              <span class="value" id="confirm-service">—</span>
+            </div>
+            <div class="confirm-row">
+              <span class="label">Dato</span>
+              <span class="value" id="confirm-date">—</span>
+            </div>
+            <div class="confirm-row">
+              <span class="label">Tidspunkt</span>
+              <span class="value" id="confirm-time">—</span>
+            </div>
+            <div class="confirm-row">
+              <span class="label">Fysioterapeut</span>
+              <span class="value">Karen Goetsche</span>
+            </div>
+            <div class="confirm-row">
+              <span class="label">Sted</span>
+              <span class="value">Skovly Plejecenter</span>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline" onclick="goBookingStep(3)">← Tilbage</button>
+            <button class="btn btn-primary" style="flex:1;" onclick="confirmBooking()">✓ Book tid</button>
+          </div>
+        </div>
+
+        <!-- Step 5: Success -->
+        <div class="booking-step" id="booking-step-5">
+          <div class="success-state">
+            <div class="success-icon">✅</div>
+            <h2>Tid booket!</h2>
+            <p>Din aftale er registreret. Du modtager en bekræftelse på SMS.</p>
+            <button class="btn btn-primary btn-block" onclick="closeBooking()">Luk</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointment Detail Modal (Fysio) -->
+    <div class="modal-overlay" id="modal-appt-detail">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <h2 id="appt-detail-name">—</h2>
+        <div class="card mb-16" style="background:var(--bg);">
+          <div class="confirm-row">
+            <span class="label">Plejecenter</span>
+            <span class="value" id="appt-detail-place">—</span>
+          </div>
+          <div class="confirm-row">
+            <span class="label">Behandling</span>
+            <span class="value" id="appt-detail-type">—</span>
+          </div>
+          <div class="confirm-row">
+            <span class="label">Tid</span>
+            <span class="value" id="appt-detail-time">—</span>
+          </div>
+          <div class="confirm-row">
+            <span class="label">Status</span>
+            <span class="value" id="appt-detail-status">—</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-secondary btn-sm" onclick="closeApptDetail()">Luk</button>
+          <button class="btn btn-primary btn-sm" style="flex:1;">📝 Tilføj noter</button>
+          <button class="btn btn-outline btn-sm">📞 Ring</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Client Detail Modal (Fysio) -->
+    <div class="modal-overlay" id="modal-client-detail">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+          <div class="client-avatar" style="width:52px;height:52px;font-size:22px;" id="client-detail-avatar">👵</div>
+          <div>
+            <h2 style="font-size:18px;margin-bottom:2px;" id="client-detail-name">—</h2>
+            <p class="text-sm text-light" id="client-detail-place">—</p>
+          </div>
+        </div>
+        <div class="card mb-16" style="background:var(--bg);">
+          <div class="confirm-row">
+            <span class="label">Sidste besøg</span>
+            <span class="value" id="client-detail-last">—</span>
+          </div>
+          <div class="confirm-row">
+            <span class="label">Næste aftale</span>
+            <span class="value" id="client-detail-next">—</span>
+          </div>
+          <div class="confirm-row">
+            <span class="label">Aktiv plan</span>
+            <span class="value">Styrke & Balance</span>
+          </div>
+          <div class="confirm-row">
+            <span class="label">Øvelsesfremmøde</span>
+            <span class="value" style="color:var(--success);">71%</span>
+          </div>
+        </div>
+        <div class="section-title" style="margin-top:0;">Historik</div>
+        <div class="card card-sm mb-8">
+          <div style="font-size:13px;">
+            <span class="fw-600">3. mar</span> — Individuel behandling
+            <p class="text-sm text-light mt-8">Fremgang i hoftemobilitet. Fortsat fokus på balance.</p>
+          </div>
+        </div>
+        <div class="card card-sm mb-8">
+          <div style="font-size:13px;">
+            <span class="fw-600">24. feb</span> — Helbredsvurdering
+            <p class="text-sm text-light mt-8">Første screening. Øvelsesprogram udarbejdet.</p>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-outline btn-block" onclick="closeClientDetail()">Luk</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screen-container -->
+</div><!-- /phone-frame -->
+
+<script>
+// ===== STATE =====
+let currentRole = null; // 'borger' or 'fysio'
+let currentBorgerTab = 0;
+let currentFysioTab = 0;
+let booking = { service: '', date: null, time: '' };
+
+const borgerScreens = ['screen-b-hjem', 'screen-b-tjenester', 'screen-b-aftaler', 'screen-b-oevelser', 'screen-b-profil'];
+const fysioScreens = ['screen-f-overblik', 'screen-f-aftaler', 'screen-f-borgere', 'screen-f-leads', 'screen-f-rute'];
+
+// ===== NAVIGATION =====
+function hideAllScreens() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+}
+
+function showScreen(id) {
+  hideAllScreens();
+  document.getElementById(id).classList.add('active');
+}
+
+function selectRole(role) {
+  currentRole = role;
+  if (role === 'borger') {
+    switchTab('borger', 0);
+  } else {
+    switchTab('fysio', 0);
+  }
+}
+
+function switchTab(role, index) {
+  const screens = role === 'borger' ? borgerScreens : fysioScreens;
+  showScreen(screens[index]);
+
+  if (role === 'borger') currentBorgerTab = index;
+  else currentFysioTab = index;
+
+  // Update tab bar active states in the shown screen
+  const screen = document.getElementById(screens[index]);
+  const tabs = screen.querySelectorAll('.tab-bar .tab');
+  tabs.forEach((t, i) => {
+    t.classList.toggle('active', i === index);
+  });
+}
+
+function logout() {
+  currentRole = null;
+  showScreen('screen-landing');
+}
+
+// ===== BOOKING FLOW =====
+function openBooking() {
+  booking = { service: '', date: null, time: '' };
+  resetBookingUI();
+  goBookingStep(1);
+  document.getElementById('modal-booking').classList.add('active');
+}
+
+function openBookingWithService(service) {
+  booking = { service: service, date: null, time: '' };
+  resetBookingUI();
+  // Pre-select service and go to step 2
+  const options = document.querySelectorAll('#booking-step-1 .booking-option');
+  options.forEach(o => {
+    o.classList.remove('selected');
+    if (o.querySelector('h4').textContent.includes(service.split(' ')[0])) {
+      o.classList.add('selected');
+    }
+  });
+  goBookingStep(2);
+  document.getElementById('modal-booking').classList.add('active');
+}
+
+function closeBooking() {
+  document.getElementById('modal-booking').classList.remove('active');
+}
+
+function resetBookingUI() {
+  document.querySelectorAll('.booking-option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.date-cell').forEach(d => d.classList.remove('selected'));
+  document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+  document.getElementById('btn-date-next').disabled = true;
+  document.getElementById('btn-time-next').disabled = true;
+}
+
+function goBookingStep(step) {
+  document.querySelectorAll('.booking-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('booking-step-' + step).classList.add('active');
+
+  if (step === 4) {
+    document.getElementById('confirm-service').textContent = booking.service;
+    document.getElementById('confirm-date').textContent = booking.date + '. marts 2026';
+    document.getElementById('confirm-time').textContent = 'kl. ' + booking.time;
+  }
+}
+
+function selectBookingService(el, service) {
+  document.querySelectorAll('#booking-step-1 .booking-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  booking.service = service;
+  goBookingStep(2);
+}
+
+function selectDate(el, day) {
+  document.querySelectorAll('.date-cell').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+  booking.date = day;
+  document.getElementById('btn-date-next').disabled = false;
+  document.getElementById('selected-date-label').textContent = day + '. marts 2026';
+}
+
+function selectTime(el, time) {
+  document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  booking.time = time;
+  document.getElementById('btn-time-next').disabled = false;
+}
+
+function confirmBooking() {
+  goBookingStep(5);
+}
+
+// ===== EXERCISES =====
+function toggleExercise(el) {
+  el.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress() {
+  const checks = document.querySelectorAll('#screen-b-oevelser .exercise-check');
+  const done = document.querySelectorAll('#screen-b-oevelser .exercise-check.checked').length;
+  const total = checks.length;
+  const pct = done / total;
+  const circumference = 163.36;
+  const offset = circumference * (1 - pct);
+  document.getElementById('progress-circle').style.strokeDashoffset = offset;
+  document.getElementById('progress-text').textContent = done + '/' + total;
+}
+
+// ===== COLLAPSIBLE =====
+function toggleCollapsible(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// ===== WEEK DAY SELECTOR =====
+function selectWeekDay(el) {
+  document.querySelectorAll('.week-day').forEach(d => d.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== FYSIO MODALS =====
+function showApptDetail(name, place, type, time, status) {
+  document.getElementById('appt-detail-name').textContent = name;
+  document.getElementById('appt-detail-place').textContent = place;
+  document.getElementById('appt-detail-type').textContent = type;
+  document.getElementById('appt-detail-time').textContent = time;
+  document.getElementById('appt-detail-status').textContent = status;
+  document.getElementById('modal-appt-detail').classList.add('active');
+}
+
+function closeApptDetail() {
+  document.getElementById('modal-appt-detail').classList.remove('active');
+}
+
+function showClientDetail(name, place, last, next) {
+  document.getElementById('client-detail-name').textContent = name;
+  document.getElementById('client-detail-place').textContent = place;
+  document.getElementById('client-detail-last').textContent = last.replace('Sidst: ', '');
+  document.getElementById('client-detail-next').textContent = next.replace('Næste: ', '');
+  document.getElementById('modal-client-detail').classList.add('active');
+}
+
+function closeClientDetail() {
+  document.getElementById('modal-client-detail').classList.remove('active');
+}
+
+// ===== CLIENT SEARCH =====
+function filterClients(query) {
+  const cards = document.querySelectorAll('#client-list .client-card');
+  const q = query.toLowerCase();
+  cards.forEach(card => {
+    const name = card.querySelector('h4').textContent.toLowerCase();
+    const info = card.querySelector('p').textContent.toLowerCase();
+    card.style.display = (name.includes(q) || info.includes(q)) ? '' : 'none';
+  });
+}
+
+// ===== LEADS =====
+function handleLead(btn, action) {
+  const card = btn.closest('.lead-card');
+  if (action === 'afvis') {
+    card.style.opacity = '0.4';
+    card.style.pointerEvents = 'none';
+    card.querySelector('.lead-header').insertAdjacentHTML('afterend',
+      '<p style="color:var(--danger);font-size:12px;font-weight:600;margin-bottom:4px;">Afvist</p>');
+  } else if (action === 'book') {
+    card.style.borderLeftColor = 'var(--success)';
+    card.querySelector('.btn-group').innerHTML = '<span style="color:var(--success);font-size:13px;font-weight:600;">✓ Vurdering booket</span>';
+  } else if (action === 'ring') {
+    alert('Ringer op... (simuleret)');
+  }
+}
+
+// ===== CLOSE MODALS ON OVERLAY CLICK =====
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+    }
+  });
+});
+</script>
+</body>
+</html>
